@@ -1,0 +1,74 @@
+#Criando_Sistema_Bancário
+import datetime
+
+class Banco:
+    def __init__(self):
+        self.saldo = 0.0
+        self.saques_diarios = 0
+        self.limite_saques = 3
+        self.limite_valor_saque = 500.0
+        self.extrato = []
+        self.data_ultimo_saque = None
+
+    def formatar_valor(self, valor):
+        return f"R$ {valor:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+
+    def depositar(self, valor):
+        if valor > 0:
+            self.saldo += valor
+            self.extrato.append(f"Depósito: {self.formatar_valor(valor)}")
+        else:
+            print("Valor de depósito inválido.")
+
+    def sacar(self, valor):
+        hoje = datetime.date.today()
+        if self.data_ultimo_saque != hoje:
+            self.saques_diarios = 0
+            self.data_ultimo_saque = hoje
+
+        if valor <= 0:
+            print("Não é possível sacar valores negativos ou zero.")
+        elif valor > self.saldo:
+            print("Sua conta não tem saldo suficiente.")
+        elif self.saques_diarios >= self.limite_saques:
+            print("Limite de saques diários atingido.")
+        elif valor > self.limite_valor_saque:
+            print("O valor máximo para saque é de R$ 500,00.")
+        else:
+            self.saldo -= valor
+            self.saques_diarios += 1
+            self.extrato.append(f"Saque: {self.formatar_valor(valor)}")
+
+    def mostrar_extrato(self):
+        print("\nExtrato:")
+        for operacao in self.extrato:
+            print(operacao)
+        print(f"Saldo atual: {self.formatar_valor(self.saldo)}")
+        print()
+
+def menu():
+    banco = Banco()
+    while True:
+        print("Escolha uma operação:")
+        print("[d] Depositar")
+        print("[s] Sacar")
+        print("[e] Extrato")
+        print("[q] Sair")
+        escolha = input().lower()
+
+        if escolha == 'd':
+            valor = float(input("Digite o valor para depósito: "))
+            banco.depositar(valor)
+        elif escolha == 's':
+            valor = float(input("Digite o valor para saque: "))
+            banco.sacar(valor)
+        elif escolha == 'e':
+            banco.mostrar_extrato()
+        elif escolha == 'q':
+            print("Saindo do sistema...")
+            break
+        else:
+            print("Escolha inválida. Tente novamente.")
+
+if __name__ == "__main__":
+    menu()
